@@ -104,18 +104,7 @@ export const lifeCircleConfig: LifeCircleItemConfig[] = [
 ]
 
 /**
- * 4. POI 行业分类图标与标签色彩 (POI Categories Config)
- */
-export const poiCategoryColors: Record<string, { bg: string; text: string; badge: string }> = {
-  hospital: { bg: '#edf9f8', text: '#25a6b3', badge: '医' },
-  school: { bg: '#f5f0ff', text: '#8064d8', badge: '学' },
-  mall: { bg: '#fff2f0', text: '#e56c55', badge: '商' },
-  transit: { bg: '#eef4ff', text: '#2f6df6', badge: '站' },
-  park: { bg: '#edf8f2', text: '#2d9d70', badge: '园' },
-}
-
-/**
- * 5. 高德全城小区按视野动态扫描配置 (Viewport PlaceSearch Config)
+ * 4. 高德全城小区按视野动态扫描配置 (Viewport PlaceSearch Config)
  */
 export const viewportScanConfig = {
   // 是否默认开启当前视野小区动态扫描（当前为默认关闭）

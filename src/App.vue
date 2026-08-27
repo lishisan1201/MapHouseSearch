@@ -4,7 +4,6 @@
       ref="mapRef"
       :areas="areas"
       :communities="filteredCommunities"
-      :pois="pois"
       :zoom="zoom"
       :selected-id="selectedId"
       :layer="visibleLayer"
@@ -12,12 +11,10 @@
       :enable-viewport-scan="enableViewportScan"
       :show-community-names="showCommunityNames"
       :show-prices="showPrices"
-      :show-pois="showPois"
       :draw-mode="drawMode"
       :draw-points="drawPoints"
       @select="selectCommunity"
       @area-select="selectArea"
-      @poi-select="selectPoi"
       @zoom-change="zoom = $event"
       @draw-point="drawPoints.push($event)"
       @discovered-scan="discoveredCount = $event"
@@ -35,7 +32,7 @@
       <div class="search-area">
         <div class="search-box" :class="{ focused: searchInput }">
           <Search :size="19" />
-          <input v-model="searchInput" type="search" placeholder="搜索小区、片区或医院" @keydown.esc="searchInput = ''" />
+          <input v-model="searchInput" type="search" placeholder="搜索小区或片区" @keydown.esc="searchInput = ''" />
           <button v-if="searchInput" class="clear-search" type="button" title="清空搜索" @click="searchInput = ''"><X :size="15" /></button>
         </div>
         <div v-if="searchInput && searchResults.length" class="search-results">
@@ -91,7 +88,6 @@
             <label class="toggle-row"><span><MapPin :size="16" />已整理小区</span><input v-model="showCommunityNames" type="checkbox" /><i></i></label>
             <label class="toggle-row"><span><Radar :size="16" />高德全城小区扫描 <small v-if="discoveredCount" class="badge-count">{{ discoveredCount }}</small></span><input v-model="enableViewportScan" type="checkbox" /><i></i></label>
             <label class="toggle-row"><span><Tag :size="16" />价格气泡</span><input v-model="showPrices" type="checkbox" /><i></i></label>
-            <label class="toggle-row"><span><Landmark :size="16" />医院 / 学校 / 商圈</span><input v-model="showPois" type="checkbox" /><i></i></label>
           </div>
         </div>
         <button class="toolbar-button import-action" type="button" @click="importOpen = true"><Upload :size="16" />导入数据</button>
@@ -165,19 +161,18 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { ArrowUpRight, Box, CheckCircle2, ChevronDown, ChevronUp, Globe, Home, Landmark, Layers3, MapPin, MapPinned, Minus, PencilRuler, Plus, Radar, Save, Search, SlidersHorizontal, Tag, Upload, X } from 'lucide-vue-next'
+import { ArrowUpRight, Box, CheckCircle2, ChevronDown, ChevronUp, Globe, Home, Layers3, MapPin, MapPinned, Minus, PencilRuler, Plus, Radar, Save, Search, SlidersHorizontal, Tag, Upload, X } from 'lucide-vue-next'
 import MapCanvas from './components/MapCanvas.vue'
 import CommunityDetail from './components/CommunityDetail.vue'
 import ImportModal from './components/ImportModal.vue'
 import { demoData } from './data/demoData'
 import { createArea as apiCreateArea, importCommunities as apiImportCommunities, loadMapData, refreshCommunity as apiRefreshCommunity, updatePersonal } from './lib/api'
 import { filterCommunities, getVisibleLayer, searchCommunities } from './lib/mapUtils'
-import type { Area, BaseMapType, Community, Coordinate, MapLayer, Poi } from './types'
+import type { Area, BaseMapType, Community, Coordinate, MapLayer } from './types'
 import { viewportScanConfig } from './customConfig'
 
 const areas = ref<Area[]>(demoData.areas.map((area) => ({ ...area, polygon: area.polygon.map((point) => [...point] as Coordinate) })))
 const communities = ref<Community[]>(demoData.communities.map((community) => ({ ...community, tags: [...community.tags], snapshots: community.snapshots.map((snapshot) => ({ ...snapshot })) })))
-const pois = ref<Poi[]>(demoData.pois)
 const zoom = ref(13.5)
 const selectedId = ref<string>()
 const baseMapType = ref<BaseMapType>('normal')
@@ -201,7 +196,6 @@ const minPrice = ref<number>()
 const maxPrice = ref<number>()
 const showCommunityNames = ref(true)
 const showPrices = ref(true)
-const showPois = ref(true)
 const filterMenuOpen = ref(false)
 const layerMenuOpen = ref(false)
 const importOpen = ref(false)
@@ -242,11 +236,6 @@ function selectCommunity(id: string) {
 function selectArea(id: string) {
   const area = areas.value.find((item) => item.id === id)
   if (area) showToast(`已选中片区：${area.name}`)
-}
-
-function selectPoi(id: string) {
-  const poi = pois.value.find((item) => item.id === id)
-  if (poi) showToast(`${poi.name} · ${poi.subtitle}`)
 }
 
 function resetFilters() {

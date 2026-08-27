@@ -56,12 +56,11 @@ VITE_AMAP_SECURITY_CODE=你的安全密钥</code></pre>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { AlertTriangle, KeyRound, Loader2, RefreshCw, X } from 'lucide-vue-next'
 import { load as loadAmapApi } from '@amap/amap-jsapi-loader'
-import type { Area, BaseMapType, Community, Coordinate, MapLayer, Poi, PoiCategory } from '../types'
+import type { Area, BaseMapType, Community, Coordinate, MapLayer } from '../types'
 import {
   lifeCircleConfig,
   mapThemeConfig,
   markerThemeConfig,
-  poiCategoryColors,
   viewportScanConfig,
 } from '../customConfig'
 
@@ -77,7 +76,6 @@ const props = withDefaults(
   defineProps<{
     areas: Area[]
     communities: Community[]
-    pois: Poi[]
     zoom: number
     selectedId?: string
     layer: MapLayer
@@ -85,7 +83,6 @@ const props = withDefaults(
     enableViewportScan?: boolean
     showCommunityNames: boolean
     showPrices: boolean
-    showPois: boolean
     drawMode: boolean
     drawPoints: Coordinate[]
   }>(),
@@ -98,7 +95,6 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: 'select', id: string): void
   (event: 'area-select', id: string): void
-  (event: 'poi-select', id: string): void
   (event: 'zoom-change', value: number): void
   (event: 'draw-point', value: Coordinate): void
   (event: 'discovered-scan', count: number): void
@@ -137,10 +133,6 @@ const discoveredCommunities = ref<DiscoveredCommunity[]>([])
 
 function formatWan(price: number) {
   return `${(price / 10000).toFixed(2)}万`
-}
-
-function poiBadge(category: PoiCategory) {
-  return poiCategoryColors[category]?.badge || '标'
 }
 
 async function loadAmap() {
@@ -641,19 +633,6 @@ function renderAmap() {
     })
   }
 
-  if (props.showPois && props.layer !== 'area') {
-    props.pois.forEach((poi) => {
-      amapOverlays.push(
-        new amapApi.Marker({
-          position: poi.center,
-          content: `<span class="amap-poi-marker">${poiBadge(poi.category)} ${poi.name}</span>`,
-          offset: new amapApi.Pixel(-22, -14),
-          zIndex: 8,
-        }),
-      )
-    })
-  }
-
   if (props.drawMode && props.drawPoints.length >= 2) {
     amapOverlays.push(
       new amapApi.Polyline({
@@ -672,12 +651,10 @@ function renderAmap() {
 watch(
   () => [
     props.layer,
-    props.showPois,
     props.showPrices,
     props.showCommunityNames,
     props.communities,
     props.areas,
-    props.pois,
     props.drawMode,
     props.drawPoints,
   ],
