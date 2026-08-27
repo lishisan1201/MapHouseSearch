@@ -91,7 +91,7 @@ const props = withDefaults(
   }>(),
   {
     baseMapType: 'normal',
-    enableViewportScan: true,
+    enableViewportScan: viewportScanConfig.defaultEnabled,
   },
 )
 

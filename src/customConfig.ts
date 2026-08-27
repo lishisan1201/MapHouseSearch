@@ -118,8 +118,8 @@ export const poiCategoryColors: Record<string, { bg: string; text: string; badge
  * 5. 高德全城小区按视野动态扫描配置 (Viewport PlaceSearch Config)
  */
 export const viewportScanConfig = {
-  // 是否默认开启当前视野小区动态扫描
-  defaultEnabled: true,
+  // 是否默认开启当前视野小区动态扫描（当前为默认关闭）
+  defaultEnabled: false,
   // 触发扫描的最小缩放级别（推荐 >= 13，放大到街区级才开始高密度扫描，防止全国视野浪费请求）
   minZoom: 13,
   // 视野移动或缩放停止后的防抖延时（毫秒）
